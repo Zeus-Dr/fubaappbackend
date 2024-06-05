@@ -1,6 +1,6 @@
 # FUBA NBA MOBILE APPLICATION
 
-This project is an API for the FUBA NBA Mobile Application.
+This project is an API for the FUBA NBA Mobile Application which is [here](https://github.com/Zeus-Dr/nbl_application).
 
 The API is hosted on Render and is available via the endpoints below
 
