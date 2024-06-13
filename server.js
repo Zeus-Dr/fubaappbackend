@@ -1,4 +1,10 @@
-require("dotenv").config();
+const dotenv = require("dotenv");
+const path = require("path");
+
+const env = process.env.NODE_ENV || "development";
+const envFile = env === "development" ? ".env.local" : ".env";
+
+dotenv.config({ path: path.resolve(__dirname, envFile) });
 
 const express = require("express");
 const http = require("http");
@@ -36,6 +42,12 @@ app.use("/api/users", userRoutes);
 // Sync the database and start the server
 sequelize.sync().then(() => {
   app.listen(process.env.PORT, () => {
-    console.log("connected to db & listening on port", process.env.PORT);
+    console.log(
+      "Running in",
+      process.env.NODE_ENV,
+      "mode,",
+      "connected to db & listening on port",
+      process.env.PORT
+    );
   });
 });
