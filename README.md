@@ -8,4 +8,14 @@ For detailed API documentation, please visit [here](https://documenter.getpostma
 
 ## Features so far
 
-- User authentication and authorization
+### Authentication
+
+- **Login**
+- **Signup**
+- **Forgot Password**
+- **Reset Password**
+
+### Authentication using Facebook, Google, Apple
+
+- **SignUp with Google**
+- **SignIn with Google**

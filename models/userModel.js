@@ -27,7 +27,11 @@ const User = sequelize.define(
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true, // Change to allow null for Google sign-ins
+    },
+    googleId: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     resetToken: {
       type: DataTypes.STRING,
@@ -42,21 +46,25 @@ const User = sequelize.define(
   }
 );
 
-// static login method
+// Static login method
 User.login = async function (email, password) {
   // Validation
   if (!email || !password) {
-    throw Error("All field must be filled!");
+    throw Error("All fields must be filled!");
   }
 
-  // check if user exists
+  // Check if user exists
   const user = await User.findOne({ where: { email } });
 
   if (!user) {
     throw Error("User not found!");
   }
 
-  // compare passwords
+  // Compare passwords
+  if (!user.password) {
+    throw Error("User signed in with Google. Please use Google Sign-In.");
+  }
+
   const match = await bcrypt.compare(password, user.password);
 
   if (!match) {
@@ -66,11 +74,11 @@ User.login = async function (email, password) {
   return user;
 };
 
-// static signup method
+// Static signup method
 User.signup = async function (firstname, lastname, email, password) {
-  //Validate
+  // Validate
   if (!firstname || !lastname || !email || !password) {
-    throw Error("All field must be filled!");
+    throw Error("All fields must be filled!");
   }
 
   if (!validator.isEmail(email)) {
@@ -80,14 +88,14 @@ User.signup = async function (firstname, lastname, email, password) {
     throw Error("Password is not strong enough");
   }
 
-  // check if user exists
+  // Check if user exists
   const exists = await User.findOne({ where: { email } });
 
   if (exists) {
     throw Error("Email already in use");
   }
 
-  //Password Encryption
+  // Password Encryption
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(password, salt);
 
@@ -106,7 +114,6 @@ User.signup = async function (firstname, lastname, email, password) {
 User.resetpassword = async function (token, newPassword) {
   // Validation
   if (!validator.isStrongPassword(newPassword)) {
-    // return "Password is not strong enough";
     throw new Error("Password is not strong enough");
   }
 
@@ -118,8 +125,9 @@ User.resetpassword = async function (token, newPassword) {
       },
     },
   });
+
   if (!user) {
-    throw new Error("Invalid or Expired token");
+    throw new Error("Invalid or expired token");
   }
 
   // Password Encryption

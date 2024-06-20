@@ -61,6 +61,7 @@ const forgotPassword = async (req, res) => {
     };
 
     const token = generateResetToken();
+    user.resetToken = token;
     user.resetTokenExpiration = Date.now() + 3600000; //expires in 1hr
 
     await user.save();
@@ -99,6 +100,7 @@ const forgotPassword = async (req, res) => {
 const resetPassword = async (req, res) => {
   const { token, newPassword } = req.body;
 
+  console.log("Token and newPassowrd", token, newPassword);
   try {
     const user = await User.resetpassword(token, newPassword);
 
