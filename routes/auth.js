@@ -12,18 +12,32 @@ router.get(
   "/google/callback",
   passport.authenticate("google", { failureRedirect: "/api/auth/failure" }),
   function (req, res) {
-    // console.log("Request", req.user);
-    const token = generateJWT(req.user); // Function to generate JWT
-    res.redirect(`/api/auth/success?token=${token}`);
+    try {
+      const token = generateJWT(req.user); // Function to generate JWT
+
+      // Return a JSON response with the JWT token
+      res.status(200).json({
+        message: "Authentication successful",
+        token: token,
+        user: {
+          id: req.user.id,
+          firstname: req.user.firstname,
+          lastname: req.user.lastname,
+          email: req.user.email,
+          // Add other user information as needed
+        },
+      });
+    } catch (error) {
+      console.error("Error generating JWT:", error);
+      res
+        .status(500)
+        .json({ status: "error", message: "Internal server error" });
+    }
   }
 );
 
-router.get("/success", (req, res) => {
-  res.send("Login Successful! Token: " + req.query.token);
-});
-
 router.get("/failure", (req, res) => {
-  res.send("Login Failed");
+  res.status(401).json({ status: "error", message: "Authentication failed" });
 });
 
 module.exports = router;
